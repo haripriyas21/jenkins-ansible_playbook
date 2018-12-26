@@ -1,0 +1,42 @@
+---
+
+-name: Install java 8 using YUM #based on the version of jenkins
+yum: #ansible module
+  name: "{{java.VERSION}}" #name of the package we have to install
+  state: present  #present|latest
+ become: true
+ 
+ -name : Correct the alternatives to change default java verion.
+ alternatives: 
+  name: java
+  link: /bin/java
+  path: "{{java.ALTERNATIVES}}"
+  
+-name: Download Jenkins repo yum URL for server
+get_url:
+  url: "{{jenkins.repo_URL}}"
+  dest: /etc/yum.repos.d/jenkins.repo
+become: true
+
+-name: import GPG key
+rpm_key:
+  state: present
+  key: "{{jenkins.gpg_key}}"
+  
+-name: install jenkins
+yum:
+  name:jenkins
+  state:present
+  
+-name: change jenkins JAVA options #for security 
+lineinfile: 
+  dest=/etc/sysconfig/jenkins
+  regexp=^JENKINS_JAVA_OPTIONS=
+  line=JENKINS_JAVA_OPTIONS="{{jenkins.JAVA_OPTIONS}}"
+become: true
+
+-name: start jenkins service and enable on boot
+service:
+  name: jenkins
+  state: started
+  enabled: yes
