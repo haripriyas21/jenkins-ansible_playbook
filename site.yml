@@ -1,4 +1,4 @@
--hosts: localhost // specify host name 
+-hosts: localhost #specify host name 
 roles:
      -jenkins
 tags: jenkins
